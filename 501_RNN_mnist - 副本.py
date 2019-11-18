@@ -4,6 +4,8 @@ Created on Mon Nov 18 10:57:53 2019
 
 @author: 13115
 """
+##另一种LSTM的定义方式
+
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt 
@@ -17,11 +19,9 @@ tf.reset_default_graph() #重置图表，避免变量冲突
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 #--------------- 定义网络结构 ---------------
-#将图片28*28，每一行作为输入，28行作为一个个序列。
-#many inputs;one output(不是纬度)
 batch_size=50
-input_size =28 #输入图片的一行 widths
-time_step = 28 #序列的长度 height
+input_size =28 #输入图片的一行
+time_step = 28 #序列的长度
 n_class = 10 #分类个数
 n_hidden_layers = 64
 
@@ -30,15 +30,22 @@ ys = tf.placeholder(tf.float32,[None,n_class])
 images = tf.reshape(xs,[-1,time_step,input_size])
 
 ##定义RNN结构
-rnn_cell = tf.nn.rnn_cell.LSTMCell(num_units=n_hidden_layers) #初始化一个lstm_cell
-outputs,final_state = tf.nn.dynamic_rnn(
-            rnn_cell, #选择的lstm_cell
-            images, #输入
-            initial_state=None, #输出hidden的state
-            dtype = tf.float32,
-            time_major = False, # False: (batch, time step, input); True: (time step, batch, input)
-            )
-output = tf.layers.dense(outputs[:, -1, :], 10)  # output based on the last output step
+#初始化权值
+weights = tf.Variable(tf.truncated_normal([n_hidden_layers, n_class], stddev = 0.1))
+biase = tf.Variable(tf.constant(0.1, shape=[n_class]))
+
+
+def LSTM(X, weights, biase):
+    #inputs format : [batch_size, max_time, n_inputs]
+    inputs = tf.reshape(X, [-1, time_step, input_size])
+    #定义LSTM基本cell
+    lstm_cell = tf.nn.rnn_cell.BasicLSTMCell(n_hidden_layers)
+    outputs, final_state = tf.nn.dynamic_rnn(lstm_cell, inputs, dtype=tf.float32)
+    results = tf.nn.softmax(tf.matmul(final_state[1], weights) + biase)
+    return results
+ 
+#返回结果
+output = LSTM(xs, weights, biase)
 
 ##损失函数
 loss = tf.losses.softmax_cross_entropy(onehot_labels=ys,logits=output)
@@ -64,7 +71,7 @@ def compute_accuracy(v_xs , v_y_correct):
     result = sess.run(accuracy1, feed_dict={xs: v_xs, ys: v_y_correct})
     return result
 
-for i in range(3000):
+for i in range(300):
     batch_xs , batch_ys = mnist.train.next_batch(batch_size)
     _,loss_ = sess.run([train_step,loss],feed_dict={xs:batch_xs , ys:batch_ys})
     if i%50 == 0:
