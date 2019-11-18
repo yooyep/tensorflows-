@@ -52,4 +52,5 @@ for i in range(300):
         list_accu.append(accuracy_)
         print('正确率: %s' %accuracy_)
         print('i:%d' %i)
-tf.layers.dense(l1,10,activation)
+
+        
