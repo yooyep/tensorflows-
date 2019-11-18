@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov  7 15:8:23 20191
+Created on Thu Nov  7 15:18:23 2019
 
 @author: 13115
 """
@@ -40,6 +40,8 @@ for i in range(300):
         plt.cla()
         plt.scatter(x_data,y_data)
         plt.plot(x_data,pred,'r-',lw=3)
+        plt.text(0,1,'loss:%.4f' %loss_,fontdict={'size':20,'color':'red'})
         plt.pause(0.01)
 plt.ioff()
 plt.show()
+
