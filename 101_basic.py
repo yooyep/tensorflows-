@@ -4,6 +4,7 @@ Created on Mon Sep  9 15:24:18 2019
 
 @author: 13115
 """
+#链接: https://morvanzhou.github.io/tutorials/machine-learning/tensorflow/2-1-structure/
 
 import tensorflow as tf
 import numpy as np
