@@ -26,7 +26,7 @@ def compute_accuracy(v_xs , v_y_correct):
 #导入数据
 #tensorflow官方的读取程序 C:\Anaconda3\Lib\site-packages\tensorflow\contrib\learn\python\learn\datasets\mnist.py
 
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+mnist = input_data.read_data_sets("mnist/", one_hot=True)
 
 #--------------- 定义网络结构 ---------------
 xs = tf.placeholder(tf.float32,[None,784]) #28*28
@@ -186,6 +186,7 @@ def read_data_sets(data_path,onehot=False):
 mnist = read_data_sets(data_dir,onehot=True)
 ##mnist.train.images  mnist.test.labels来访问
 
+#%%
 #--------------- 定义网络结构 ---------------
 #占位符 定义网络的输入
 xs = tf.placeholder(tf.float32,[None,28*28])
@@ -228,12 +229,11 @@ sess.run(tf.global_variables_initializer())
 #train_wirter = tf.summary.FileWriter('log/train',sess.graph)
 #merged = tf.summary.merge_all()
 
-
+#%%
+#--------------- 训练 ---------------
 list_loss = []
 list_accu = []
-
 start=time.time()
-#--------------- 训练 ---------------
 for i in range(1000):
     batch_xs,batch_ys = mnist.train.next_batch(100)
     _ , loss_ = sess.run([train_step,cross_entropy],feed_dict={xs:batch_xs , y_correct:batch_ys})
@@ -251,6 +251,7 @@ for i in range(1000):
 #    sess.run(train_step,feed_dict={xs:mnist.train.images , y_correct:mnist.train.labels})
 end=time.time()     
 
+#%%
 #--------------- 可视化结果 ---------------
 def view_result():
     img_cont = np.random.randint(test_num)
@@ -261,8 +262,8 @@ def view_result():
     plt.imshow(img_data.reshape(28,28),cmap='gray')
     plt.title('真实值：{} 预测值：{}'.format(mnist.test.labels[img_cont].argmax() , pred.argmax()))
 
-
-     
+#%%
+#--------------- 可视化结果 九宫图效果 ---------------     
 #cls_true真实值label cls_pred预测值标签
 def view_results(images, cls_true, cls_pred=None):
     fig, axes = plt.subplots(3, 3)
