@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+#李宏毅老师讲完regression的demo，展示w b参数的回归问题
+#https://www.bilibili.com/video/av10590361?p=4
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -6,10 +9,6 @@ import matplotlib.pyplot as plt
 from pylab import mpl
 plt.rcParams['font.sans-serif'] = ['Simhei']  # 显示中文
 mpl.rcParams['axes.unicode_minus'] = False  # 解决保存图像是负号'-'显示为方块的问题
-
-#%%
-#李宏毅老师讲完regression的demo，展示w b参数的回归问题
-#https://www.bilibili.com/video/av10590361?p=4
 
 #--------------- 数据 及展示 ---------------
 x_data = [338., 333., 328., 207., 226., 25., 179., 60., 208., 606.]
@@ -28,7 +27,6 @@ y_data = np.asarray(y_data)
 #plt.legend()
 #plt.show()
 
-#%%
 #--------------- 画loss function的等高线图 ---------------
 x = np.arange(-200,-100,1) #b的参数
 y = np.arange(-5,5,0.1) #w的参数
@@ -45,11 +43,12 @@ for i in range(len(x)):
 #--------------- 训练 ---------------
 w = -4
 b = -120
-iteration = 140000
+iteration = 100000
 w_history = [w]
 b_history = [b]
+m=len(x_data)
 
-lr = 1.5
+lr = 1 #学习率
 #Adagrad的参数更新
 lr_b = 0
 lr_w = 0 
@@ -57,14 +56,21 @@ lr_w = 0
 import time
 start_time = time.time()
 for i in range(iteration):
-    m=len(x_data)
-    y_hat = (w*x_data+b)
-    grad_b = -2*np.sum(y_data - y_hat)/m
-    grad_w = -2*np.sum(np.dot(y_data - y_hat,x_data))/m
     
+    y_hat = (w*x_data+b)
+    grad_b = -2*np.sum(y_data - y_hat)
+    grad_w = -2*np.sum(np.dot(y_data - y_hat,x_data))
+    
+    #不适用numpy
+#    grad_b=0
+#    grad_w=0
+#    for n in range(len(x_data)):
+#        grad_b = grad_b - 2*(y_data[n] - b - w*x_data[n])*1.0
+#        grad_w = grad_w - 2*(y_data[n] - b - w*x_data[n])*x_data[n]
+        
     #Adagrad的参数更新
     lr_b = lr_b + grad_b**2
-    lr_w = lr_b + grad_w**2
+    lr_w = lr_w + grad_w**2
     
     b = b - lr*grad_b/np.sqrt(lr_b)
     w = w - lr*grad_w/np.sqrt(lr_w)
@@ -73,14 +79,12 @@ for i in range(iteration):
     w_history.append(w)
     loss = np.sum(np.square(y_data - (w*x_data+b)))
     if i%1000==0:
-        print('step:{} | w:{:.4f} | b:{:.4f} | loss:{:.2f}'.format(i,w,b,loss))
-        print('step:%d, w:%.4f, b:%.4f, loss:%.2f' %(i,w,b,loss))
+        print('step:{} | w:{:.2f} | b:{:.2f} | loss:{:.2f}'.format(i,w,b,loss))
+        #print('step:%d, w:%.2f, b:%.2f, loss:%.2f' %(i,w,b,loss))
 end_time = time.time()
 print("大约需要时间：",end_time-start_time)
 
-
-#%%
-# plot the figure
+#--------------- 画图 ---------------
 contour = plt.contourf(x, y, Z, 50, alpha=0.5, cmap=plt.get_cmap('jet'))  # 填充等高线
 plt.clabel(contour,fontsize=10,colors='k')
 
